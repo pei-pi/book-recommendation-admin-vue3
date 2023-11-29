@@ -3,6 +3,16 @@ export const constantRoutes = [
     {
         path:'/login',
         component:()=>import('@/views/login/index.vue'),
+    },
+    {
+      path:'/',
+      redirect:'/dashboard',
+      children: [{
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index.vue'),
+        meta: { title: '首页', icon: 'dashboard' }
+      }]
     }
 ]
   

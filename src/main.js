@@ -1,13 +1,14 @@
-import './assets/main.css'
-import './assets/tailwind.css'
-import './assets/output.css'
+import "./assets/main.css";
+import "./assets/tailwind.css";
+import "./assets/output.css";
+import 'element-plus/dist/index.css'
 
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from "vue";
+import App from "./App.vue";
 import { createVuestic } from "vuestic-ui";
-import "vuestic-ui/css";
-import router from './router'
+import "vuestic-ui/css"
 
-createApp(App).use(createVuestic())
-.use(router)
-.mount('#app')
+import router from "./router";
+import store from './store'
+
+createApp(App).use(createVuestic()).use(router).use(store).mount("#app");
