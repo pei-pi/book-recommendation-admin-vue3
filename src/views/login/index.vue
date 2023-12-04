@@ -2,7 +2,8 @@
   <div
     class="absolute w-1/3 l-1/2 t-1/2 transform -translate-x-1/2 -translate-y-1/2"
   >
-    <va-form ref="loginForm" stateful class="mb-2 flex flex-col gap-4">
+  <va-card class="auth-layout__card p-8">
+    <va-form ref="loginForm" stateful class="mb- flex flex-col gap-4">
       <va-input
         class="h-16"
         v-model="loginForm.username"
@@ -36,6 +37,8 @@
         >Login</va-button
       >
     </va-form>
+  </va-card>
+    
   </div>
 </template>
 <script setup>

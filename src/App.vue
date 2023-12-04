@@ -1,5 +1,5 @@
 <template>
-  <router-view class="w-screen h-screen"/>
+  <router-view/>
 </template>
 
 <style scoped></style>
