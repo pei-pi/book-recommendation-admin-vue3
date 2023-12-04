@@ -6,17 +6,22 @@ export const constantRoutes = [
     component: () => import("@/views/login/index.vue"),
   },
   {
-    path: "/",
-    redirect: "/dashboard",
-    children: [
-      {
-        path: "dashboard",
-        name: "Dashboard",
-        component: () => import("@/views/dashboard/index.vue"),
-        meta: { title: "首页", icon: "dashboard" },
-      },
-    ],
+    name: "navbar",
+    path: "/navbar",
+    component: () => import("@/layouts/AppLayout.vue"),
   },
+  // {
+  //   path: "/",
+  //   redirect: "/dashboard",
+  //   children: [
+  //     {
+  //       path: "dashboard",
+  //       name: "Dashboard",
+  //       component: () => import("@/views/dashboard/index.vue"),
+  //       meta: { title: "首页", icon: "dashboard" },
+  //     },
+  //   ],
+  // },
 ];
 
 const router = createRouter({

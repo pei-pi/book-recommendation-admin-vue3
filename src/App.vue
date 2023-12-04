@@ -1,7 +1,5 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <router-view class="w-screen h-screen"/>
 </template>
 
 <style scoped></style>
