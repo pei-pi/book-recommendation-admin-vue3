@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="w-screen p-0">
         <navbar />
     </div>
 </template>
