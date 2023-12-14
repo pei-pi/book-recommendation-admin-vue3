@@ -1,76 +1,74 @@
 <template>
-    <VaNavbar
-    color="#fff"
-    class="mb-3"
-  >
+  <VaNavbar color="#fff">
     <template #left>
-      <VaNavbarItem class="logo">
-        LOGO
-      </VaNavbarItem>
+      <i
+        class="iconfont icon-zhankaicaidan"
+        style="font-size: 27px; color: #154ec1"
+      ></i>
     </template>
     <template #right>
-      <VaNavbarItem class="hidden sm:block">
-        Dashboard
-      </VaNavbarItem>
-      <VaNavbarItem class="hidden sm:block">
-        Reports
-      </VaNavbarItem>
-      <VaNavbarItem class="hidden sm:block">
-        Users
-      </VaNavbarItem>
-      <VaNavbarItem>
-        <VaIcon
-          name="mdi-magnify"
-        />
-      </VaNavbarItem>
-      <VaNavbarItem>
-        <VaIcon
-          name="mdi-account-circle-outline"
-        />
-      </VaNavbarItem>
+      <VaDropdown class="pr-3">
+        <template #anchor>
+          <span class="pr-2 text-lg">{{ username }}</span>
+          <i class="iconfont icon-xiangxiajiantou" style="color:#154ec1;font-size: 14px; "></i>
+        </template>
+
+        <VaDropdownContent>
+          <va-list-item
+            v-for="option in options"
+            :key="option.name"
+            class="p-2"
+          >
+            <router-link
+              :to="{ name: option.redirectTo }"
+              @click="logout(option.name)"
+              class="profile-dropdown__item"
+            >
+              {{ option.name }}
+            </router-link>
+          </va-list-item>
+        </VaDropdownContent>
+      </VaDropdown>
     </template>
   </VaNavbar>
 </template>
 <script setup>
-import { useStore } from 'vuex'
+import { useStore } from "vuex";
 import { ref } from "vue";
+import { useRouter } from "vue-router"
 const store = useStore();
-const isSidebarMinimized = ref(store.getters.sidebar)
-import { computed } from "vue";
-import { useColors } from "vuestic-ui";
+const router = useRouter();
+const isSidebarMinimized = ref(store.getters.sidebar);
+const username = store.getters.name
+const options = ref([
+  {
+    name: "首页",
+    redirectTo: "",
+  },
+  {
+    name: "个人信息",
+    redirectTo: "",
+  },
+  {
+    name: "退出",
+    redirectTo: "login",
+  },
+]);
 
-const { currentPresetName } = useColors();
-
-const darkNavbarColors = computed(() => {
-  if (currentPresetName.value === "light") {
-    return {
-      color: "#111111",
-      textColor: "#BAFFC5",
-    };
-  } else {
-    return {
-      color: "#FBCAF6",
-      textColor: "#481269",
-    };
+function logout(e){
+  if(e === "退出"){
+    store.dispatch('user/logout').then(() => {
+    router.push({ path: "login" });
+  })
   }
-});
+}
 </script>
 
 <style scoped>
-.x-flip{
-    transform: scaleX(-100%);
+.va-navbar {
+  box-shadow: var(--va-box-shadow);
 }
-.navbar-item-slot {
-  border: 1px dashed var(--va-secondary);
-  padding: 6px 10px;
-}
-.va-navbar{
-    box-shadow: var(--va-box-shadow);
-    z-index: 2;
-    width: 100vh;
-}
-.logo {
-  font-weight: 600;
-  font-size: 1.5rem;
+.va-list-item:hover{
+  color: #154ec1;
 }
 </style>

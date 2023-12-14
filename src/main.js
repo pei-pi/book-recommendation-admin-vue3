@@ -3,6 +3,7 @@ import "./assets/tailwind.css";
 import "./assets/output.css";
 import 'element-plus/dist/index.css'
 import './permission.js'
+import './assets/icons/iconfont.css'
 
 import { createApp } from "vue";
 import App from "./App.vue";
