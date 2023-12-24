@@ -1,9 +1,10 @@
 <template>
-  <VaNavbar color="#fff">
+  <VaNavbar color="#fff" class="z-10">
     <template #left>
       <i
         class="iconfont icon-zhankaicaidan"
-        style="font-size: 27px; color: #154ec1"
+        @click="toggleMinimized"
+        :style="{ transform: `scaleX(${mini ? -1 : 1})`, fontSize: '27px', color: '#154ec1' }"
       ></i>
     </template>
     <template #right>
@@ -31,8 +32,10 @@
       </VaDropdown>
     </template>
   </VaNavbar>
+  <sideBar :minimized="mini"></sideBar>
 </template>
 <script setup>
+import sideBar from '@/components/sidebar/index.vue'
 import { useStore } from "vuex";
 import { ref } from "vue";
 import { useRouter } from "vue-router"
@@ -40,6 +43,10 @@ const store = useStore();
 const router = useRouter();
 const isSidebarMinimized = ref(store.getters.sidebar);
 const username = store.getters.name
+const mini = ref(false)
+const toggleMinimized = () =>{
+  mini.value = !mini.value;
+}
 const options = ref([
   {
     name: "首页",
@@ -66,6 +73,7 @@ function logout(e){
 
 <style scoped>
 .va-navbar {
+  z-index: 10;
   box-shadow: var(--va-box-shadow);
 }
 .va-list-item:hover{
