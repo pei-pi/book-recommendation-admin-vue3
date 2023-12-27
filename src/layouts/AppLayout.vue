@@ -2,7 +2,7 @@
     <div class="w-screen h-screen p-0 flex flex-col">
         <navbar />
         <div  style="display: flex; height: 100%;">
-            <sideBar :minimized="mini"></sideBar>
+            <sideBar class="pt-8" :minimized="mini"></sideBar>
             <div class="flex flex-row"></div>
             <router-view class="w-screen"></router-view>
         </div>

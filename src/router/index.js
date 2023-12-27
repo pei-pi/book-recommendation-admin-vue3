@@ -8,22 +8,28 @@ export const constantRoutes = [
   },
   {
     path: "/",
+    redirect:"/dashboard",
     component:AppLayout,
     children: [
       {
+        name:"Dashboard",
         path: "/dashboard",
         component: () => import("@/views/dashboard/index.vue"),
       },{
+        name:"User",
         path: "user",
         component:()=>import("@/views/user/index.vue"),
       },{
+        name:"Classify",
         path: "classify",
         component:()=>import("@/views/classify/index.vue"),
       },
       {
+        name:"Book",
         path: "book",
         component:()=>import("@/views/book/index.vue"),
       },{
+        name:"Borrow",
         path: "borrow",
         component:()=>import("@/views/borrow/index.vue"),
       }
