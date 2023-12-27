@@ -32,18 +32,16 @@
       </VaDropdown>
     </template>
   </VaNavbar>
-  <sideBar :minimized="mini"></sideBar>
 </template>
 <script setup>
-import sideBar from '@/components/sidebar/index.vue'
 import { useStore } from "vuex";
-import { ref } from "vue";
+import { ref,inject } from "vue";
 import { useRouter } from "vue-router"
 const store = useStore();
 const router = useRouter();
 const isSidebarMinimized = ref(store.getters.sidebar);
-const username = store.getters.name
-const mini = ref(false)
+const username = store.getters.name;
+const mini = inject('mini',ref(false));
 const toggleMinimized = () =>{
   mini.value = !mini.value;
 }

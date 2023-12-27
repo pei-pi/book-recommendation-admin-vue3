@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import AppLayout from "@/layouts/AppLayout.vue"
 export const constantRoutes = [
   {
     name: "login",
@@ -6,40 +7,25 @@ export const constantRoutes = [
     component: () => import("@/views/login/index.vue"),
   },
   {
-    name: "navbar",
-    path: "/navbar",
-    component: () => import("@/layouts/AppLayout.vue"),
-  },
-  {
     path: "/",
-    redirect: "/dashboard",
+    component:AppLayout,
     children: [
       {
-        path: "dashboard",
-        name: "Dashboard",
+        path: "/dashboard",
         component: () => import("@/views/dashboard/index.vue"),
-        meta: { title: "首页", icon: "dashboard" },
       },{
         path: "user",
-        name: "User",
         component:()=>import("@/views/user/index.vue"),
-        meta: {title:"用户管理",icon:""},
       },{
         path: "classify",
-        name: "Classify",
         component:()=>import("@/views/classify/index.vue"),
-        meta: {title:"图书分类管理",icon:""},
       },
       {
         path: "book",
-        name: "Book",
         component:()=>import("@/views/book/index.vue"),
-        meta: {title:"图书管理",icon:""},
       },{
         path: "borrow",
-        name: "Borrow",
         component:()=>import("@/views/borrow/index.vue"),
-        meta: {title:"借阅管理",icon:""},
       }
     ],
   },
