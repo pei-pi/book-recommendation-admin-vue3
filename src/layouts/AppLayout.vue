@@ -1,22 +1,31 @@
 <template>
-    <div class="w-screen h-screen p-0 flex flex-col">
+   <div class="w-screen h-screen p-0 flex flex-col">
         <navbar />
-        <div  style="display: flex; height: 100%;">
+        <div style="display:flex; height: 100%;">
             <sideBar class="pt-8" :minimized="mini"></sideBar>
-            <div class="flex flex-row"></div>
-            <router-view class="w-screen"></router-view>
+            <div class="container flex flex-col"> 
+                <router-view class=""></router-view>
+            </div>
+           
         </div>
     </div>
-</template>
+  </template>
 
 <script setup>
-import navbar from '../components/Navbar/index.vue'
-import sideBar from '@/components/sidebar/index.vue'
-import { ref , provide} from 'vue'
+import navbar from "../components/Navbar/index.vue";
+import sideBar from "@/components/sidebar/index.vue";
+import { ref, provide } from "vue";
 const mini = ref(false);
-provide('mini',mini);
+provide("mini", mini);
+
 </script>
 
 <style scoped>
-
+.container {
+    background-color: white;
+    margin: 30px;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 6px #a7a7a7;
+}
 </style>

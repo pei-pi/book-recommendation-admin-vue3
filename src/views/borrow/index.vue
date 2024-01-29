@@ -1,5 +1,5 @@
 <template>
-    <div>借阅管理</div>
+    <div>审核管理</div>
 </template>
 
 <script>
