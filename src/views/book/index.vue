@@ -1,14 +1,21 @@
 <template>
   <div class="mb-3">
     <VaButton color="info" size="medium" class="mr-3 w-20"> 新增 </VaButton>
-    <VaButton color="danger" size="medium" class="w-30" @click="bantchDelete()"> 批量删除 </VaButton>
+    <VaButton color="danger" size="medium" class="w-30" @click="bantchDelete()">
+      批量删除
+    </VaButton>
     <div class="float-right">
       <VaInput v-model="value" placeholder="Default" class="mr-2 h-8" />
       <VaButton icon="search" class="medium"> </VaButton>
     </div>
   </div>
-  <VaDataTable :items="displayedItems" :columns="columns" selectable select-mode="multiple"
-    @selection-change="selectedItemsEmitted = $event.currentSelectedItems">
+  <VaDataTable
+    :items="displayedItems"
+    :columns="columns"
+    selectable
+    select-mode="multiple"
+    @selection-change="selectedItemsEmitted = $event.currentSelectedItems"
+  >
     <template #cell(actions)="{ row }">
       <VaButton
         class="pt-1"
@@ -34,7 +41,7 @@
   </VaDataTable>
   <VaPagination
     v-model="currentPage"
-    class="mt-4 justify-center sm justify-start"
+    class="justify-center"
     :pages="totalPages"
     input
     buttons-preset="default"
@@ -52,8 +59,17 @@
         {{ key }}
       </div>
     </div>
-    <div style="width: 100px;position: absolute;top: 40px;right: 60px;border-radius: 5px;box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2);;">
-      <img :src=itemDetail.src>
+    <div
+      style="
+        width: 100px;
+        position: absolute;
+        top: 40px;
+        right: 60px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.2);
+      "
+    >
+      <img :src="itemDetail.src" />
     </div>
 
     <div class="flex mt-4">
@@ -110,31 +126,33 @@ function getBook() {
     request({
       url: "/book/getAllBook",
       method: "get",
-    }).then((res) => {
-      items.value = [];
-      res = res.data.books;
-      console.log(res);
-      res.forEach((element, index) => {
-        items.value[index] = {
-          id: element.id,
-          "标题": element.bookTitle,
-          "作者": element.bookAuthor,
-          "标签": element.bookTags,
-          "分类": element.bookCategory,
-          "详细分类": element.bookDetailCategory,
-          "馆藏数量": element.store,
-          "图书简介": element.bookContent,
-           src: `${baseURL}/${element.bookSrc}.jpg`,
-        };
-      });
-    }).catch(error=>{
-      ElMessage({
+    })
+      .then((res) => {
+        items.value = [];
+        res = res.data.books;
+        console.log(res);
+        res.forEach((element, index) => {
+          items.value[index] = {
+            id: element.id,
+            标题: element.bookTitle,
+            作者: element.bookAuthor,
+            标签: element.bookTags,
+            分类: element.bookCategory,
+            详细分类: element.bookDetailCategory,
+            馆藏数量: element.store,
+            图书简介: element.bookContent,
+            src: `${baseURL}/${element.bookSrc}.jpg`,
+          };
+        });
+      })
+      .catch((error) => {
+        ElMessage({
           showClose: true,
           message: "获取图书列表失败",
           type: "error",
         });
-      reject(error);
-    })
+        reject(error);
+      });
   });
 }
 // 显示详细信息
@@ -156,36 +174,36 @@ function deleteConfirm(row) {
 }
 // 删除
 function deleteItemById(delId) {
-  console.log(delId)
+  console.log(delId);
   return new Promise((resolve, reject) => {
     request({
-      url: `/book/deleteBookById?bookId=${delId}` ,
+      url: `/book/deleteBookById?bookId=${delId}`,
       method: "delete",
-    }).then((res) => {
-      ElMessage({
-        showClose: true,
-        message: "图书删除成功",
-        type: "success",
-      });
+    })
+      .then((res) => {
+        ElMessage({
+          showClose: true,
+          message: "图书删除成功",
+          type: "success",
+        });
 
-      getBook();
-      resolve(res);
-    }).catch(error=>{
-      ElMessage({
+        getBook();
+        resolve(res);
+      })
+      .catch((error) => {
+        ElMessage({
           showClose: true,
           message: "图书删除失败",
           type: "error",
         });
         console.error(error);
         reject(error);
-    });
+      });
   });
 }
 // 批量删除
 function bantchDelete() {
-  var selectedItemsArray = selectedItemsEmitted.value.map(
-    (item) => item.id
-  );
+  var selectedItemsArray = selectedItemsEmitted.value.map((item) => item.id);
   confirm({
     message: "是否删除选中图书？",
     okText: "确定",
