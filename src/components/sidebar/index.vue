@@ -8,7 +8,7 @@
             :class="item.icon"
             :style="iconStyle(item.active)"
           ></i>
-          <VaSidebarItemTitle>
+          <VaSidebarItemTitle class="text-sm">
             {{ item.title }}
           </VaSidebarItemTitle>
         </VaSidebarItemContent>
@@ -24,7 +24,7 @@ import { ref, watch } from "vue";
 let items = ref(NavigationRoutes.routes);
 let iconStyle = (active) => {
   return {
-    fontSize: "1.3rem",
+    fontSize: "1rem",
     color: active ? "white" : "rgb(68, 68, 68)",
     marginRight: "1rem",
   };

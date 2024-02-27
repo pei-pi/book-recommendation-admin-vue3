@@ -5,6 +5,7 @@ import 'element-plus/dist/index.css'
 import './permission.js'
 import './assets/icons/iconfont.css'
 
+import Axios from 'axios'
 import { createApp } from "vue";
 import App from "./App.vue";
 import { createVuestic } from "vuestic-ui";

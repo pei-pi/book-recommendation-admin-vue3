@@ -3,8 +3,8 @@
         <navbar />
         <div style="display:flex; height: 100%;">
             <sideBar class="pt-8" :minimized="mini"></sideBar>
-            <div class="container flex flex-col"> 
-                <router-view class=""></router-view>
+            <div class="container flex flex-col w-full"> 
+                <router-view></router-view>
             </div>
            
         </div>
@@ -23,8 +23,8 @@ provide("mini", mini);
 <style scoped>
 .container {
     background-color: white;
-    margin: 30px;
-    padding: 30px;
+    margin:10px;
+    padding: 20px;
     border-radius: 5px;
     box-shadow: 2px 2px 6px #a7a7a7;
 }

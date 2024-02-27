@@ -4,13 +4,13 @@
       <i
         class="iconfont icon-zhankaicaidan"
         @click="toggleMinimized"
-        :style="{ transform: `scaleX(${mini ? -1 : 1})`, fontSize: '27px', color: '#154ec1' }"
+        :style="{ transform: `scaleX(${mini ? -1 : 1})`, fontSize: '24px', color: '#154ec1' }"
       ></i>
     </template>
     <template #right>
       <VaDropdown class="pr-3">
         <template #anchor>
-          <span class="pr-2 text-lg">{{ username }}</span>
+          <span class="pr-2 text-base">{{ username }}</span>
           <i class="iconfont icon-xiangxiajiantou" style="color:#154ec1;font-size: 14px; "></i>
         </template>
 
