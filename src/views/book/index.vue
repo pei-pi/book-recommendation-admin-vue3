@@ -131,8 +131,8 @@ var items = ref([]);
 const selectedFile = ref();
 
 const columns = ref([
-  { key: "标题" },
-  { key: "作者" },
+  { key: "标题" ,width:"20rem"},
+  { key: "作者" ,width:"18rem"},
   { key: "标签" },
   { key: "分类" },
   { key: "actions" },
@@ -393,6 +393,11 @@ function changeImg(event) {
 }
 .va-data-table {
   font-size: smaller;
+}
+.va-data-table td {
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; /* 显示省略号 */
 }
 .va-data-table__table-tr--expanded > td > div {
   width: 100%;
