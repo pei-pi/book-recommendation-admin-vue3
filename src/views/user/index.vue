@@ -94,7 +94,7 @@
       v-for="key in Object.keys(editedItem)"
       :key="key"
       v-model="editedItem[key]"
-      class="my-6"
+      class="my-3 ml-2"
       :label="key"
       :disabled="key === 'userId'"
     />
@@ -379,11 +379,11 @@ function validate(item) {
   console.log(item);
   return Promise.resolve()
     .then(() => {
-      const uPattern = /^[a-zA-Z0-9_]{4,10}$/;
+      const uPattern = /^[a-zA-Z0-9_\u4e00-\u9fa5]{4,10}$/;
       if (!uPattern.test(item.username)) {
         ElNotification({
           title: "用户名不合法",
-          message: "请输入4-10位英文、数字或下划线。",
+          message: "请输入4-10位中文、英文、数字或下划线。",
           type: "warning",
         });
         validation.value = false;

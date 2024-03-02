@@ -76,6 +76,65 @@
       <VaButton size="medium" preset="primary" @click="hide()"> 关闭 </VaButton>
     </div>
   </VaModal>
+
+  <VaModal
+    class="modal-crud"
+    :model-value="!!editedItem"
+    title="编辑图书"
+    okText="确定"
+    cancelText="取消"
+    @ok="editItem"
+    @cancel="resetEditedItem"
+  >
+    <!-- <template v-for="(key, value) in editedItem" :key="key">
+      <VaInput
+        v-if="value !== '图书简介' && value !== 'src'"
+        v-model="editedItem[value]"
+        class="my-3 ml-5"
+        :label="value"
+        :disabled="value === 'id'"
+      />
+      <VaTextarea
+        class="my-3 ml-5"
+        v-if="value === '图书简介'"
+        v-model="editedItem['图书简介']"
+        label="图书简介"
+      />
+      <input
+        type="image"
+        v-if="value === 'src'"
+        class="my-3 ml-5"
+        :src="editedItem['src']"
+        style="width: 250px"
+      />
+    </template> -->
+    <VaInput
+      v-for="key in filteredKeys"
+      :key="key"
+      v-model="editedItem[key]"
+      class="my-3 ml-5"
+      :label="key"
+      :disabled="key === 'id'"
+    />
+    <VaTextarea
+        class="my-3 ml-5"
+        v-model="editedItem['图书简介']"
+        label="图书简介"
+      />
+      <input
+        type="image"
+        class="my-3 ml-5"
+        :src="editedItem['src']"
+        style="width: 250px"
+      />
+    <input
+      class="my-3 ml-5"
+      style="background-color: "
+      type="file"
+      @change="changeImg"
+    />
+  </VaModal>
+
 </template>
 
 <script setup>
@@ -83,12 +142,15 @@ import request from "@/utils/request";
 import { ElMessage } from "element-plus";
 import { useModal } from "vuestic-ui";
 import { onMounted, computed, ref } from "vue";
-
+const baseURL = import.meta.env.VITE_APP_BASE_API;
 const { confirm } = useModal();
 
 const itemDetail = ref(null);
+const editedItem = ref(null);
+const tempItem = ref(null);
 const selectedItemsEmitted = ref(null);
 var items = ref([]);
+const selectedFile = ref();
 
 const columns = ref([
   { key: "标题" },
@@ -103,6 +165,9 @@ const itemsPerPage = ref(7);
 onMounted(() => {
   getBook();
 });
+const filteredKeys = computed(() => {
+  return Object.keys(editedItem.value).filter(key => key!=='图书简介'&&key!=='src')
+})
 const displayedItems = computed(() => {
   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
   const endIndex = startIndex + itemsPerPage.value;
@@ -121,7 +186,7 @@ const totalPages = computed(() => {
 });
 // 获取图书列表
 function getBook() {
-  const baseURL = import.meta.env.VITE_APP_BASE_API;
+  selectedFile.value = null;
   return new Promise((resolve, reject) => {
     request({
       url: "/book/getAllBook",
@@ -141,7 +206,7 @@ function getBook() {
             详细分类: element.bookDetailCategory,
             馆藏数量: element.store,
             图书简介: element.bookContent,
-            src: `${baseURL}/${element.bookSrc}.jpg`,
+            src: `${baseURL}/${element.bookSrc}`,
           };
         });
       })
@@ -237,6 +302,100 @@ function deleteItems(selectedItemsArray) {
       });
   });
 }
+// 编辑图书模态框
+function openModalToEditItemById(id) {
+  tempItem.value = JSON.parse(JSON.stringify(this.items.filter(
+    (book) => book.id == id.rowData.id
+  )[0]));
+  editedItem.value = JSON.parse(JSON.stringify(this.items.filter(
+    (book) => book.id == id.rowData.id
+  )[0]));
+}
+// 编辑图书-》图片
+function editItem() {
+  if (selectedFile.value) {
+    const formData = new FormData();
+    formData.append("image", selectedFile.value);
+    request({
+      url: "/upload/image",
+      method: "POST",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+      .then((response) => {
+        editContent(response.data.message,1);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } else {
+    var src = editedItem.value.src.split("/");
+    editContent(src[src.length - 1],0);
+  }
+}
+
+// 编辑图书=》内容
+function editContent(src,sign) {
+  if (
+    editedItem.value.标题 === tempItem.value.标题 &&
+    editedItem.value.作者 === tempItem.value.作者 &&
+    editedItem.value.标签 === tempItem.value.标签 &&
+    editedItem.value.分类 === tempItem.value.分类 &&
+    editedItem.value.图书简介 === tempItem.value.图书简介 &&
+    editedItem.value.详细分类 === tempItem.value.详细分类 &&
+    editedItem.value.馆藏数量 == tempItem.value.馆藏数量&&sign===0
+  ) {
+    editedItem.value = false;
+  } else {
+    return new Promise((resolve, reject) => {
+      request({
+        url: "book/updataBook",
+        method: "post",
+        data: {
+          id: editedItem.value.id,
+          bookTitle: editedItem.value.标题,
+          bookAuthor: editedItem.value.作者,
+          bookTags: editedItem.value.标签,
+          bookContent: editedItem.value.图书简介,
+          bookCategory: editedItem.value.分类,
+          bookDetailCategory: editedItem.value.详细分类,
+          store: editedItem.value.馆藏数量,
+          bookSrc: src,
+        },
+      })
+        .then((res) => {
+          ElMessage({
+            showClose: true,
+            message: "图书编辑成功",
+            type: "success",
+          });
+          resolve(res);
+          editedItem.value = false;
+          getBook();
+        })
+        .catch((error) => {
+          ElMessage({
+            showClose: true,
+            message: "图书编辑失败",
+            type: "error",
+          });
+          console.error(error);
+          reject(error);
+        });
+    });
+  }
+}
+
+// 取消编辑图书
+function resetEditedItem() {
+  editedItem.value = false;
+}
+function changeImg(event) {
+  selectedFile.value = event.target.files[0];
+  editedItem.value.src = URL.createObjectURL(selectedFile.value);
+}
 </script>
 
 <style>
@@ -257,5 +416,11 @@ function deleteItems(selectedItemsArray) {
 .va-data-table__table-tr--expanded > td > div {
   width: 100%;
   background-color: pink;
+}
+.va-modal__dialog {
+  overflow-x: hidden;
+}
+.va-modal__footer {
+  margin-right: 30px;
 }
 </style>
