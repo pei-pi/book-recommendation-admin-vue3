@@ -86,28 +86,6 @@
     @ok="editItem"
     @cancel="resetEditedItem"
   >
-    <!-- <template v-for="(key, value) in editedItem" :key="key">
-      <VaInput
-        v-if="value !== '图书简介' && value !== 'src'"
-        v-model="editedItem[value]"
-        class="my-3 ml-5"
-        :label="value"
-        :disabled="value === 'id'"
-      />
-      <VaTextarea
-        class="my-3 ml-5"
-        v-if="value === '图书简介'"
-        v-model="editedItem['图书简介']"
-        label="图书简介"
-      />
-      <input
-        type="image"
-        v-if="value === 'src'"
-        class="my-3 ml-5"
-        :src="editedItem['src']"
-        style="width: 250px"
-      />
-    </template> -->
     <VaInput
       v-for="key in filteredKeys"
       :key="key"
@@ -276,6 +254,9 @@ function bantchDelete() {
   }).then((ok) => ok && deleteItems(selectedItemsArray));
 }
 function deleteItems(selectedItemsArray) {
+  if(selectedItemsArray.length === 0){
+    return;
+  }
   return new Promise((resolve, reject) => {
     request({
       url: "book/bantchDeleteBook",

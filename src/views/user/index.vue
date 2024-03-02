@@ -232,6 +232,9 @@ function bantchDelete() {
   }).then((ok) => ok && deleteItems(selectedItemsArray));
 }
 function deleteItems(selectedItemsArray) {
+  if(selectedItemsArray.length === 0){
+    return;
+  }
   return new Promise((resolve, reject) => {
     request({
       url: "user/delete",
