@@ -1,6 +1,13 @@
 <template>
   <div class="mb-3">
-    <VaButton color="info" size="medium" class="mr-3 w-20"> 新增 </VaButton>
+    <VaButton
+      color="info"
+      size="medium"
+      class="mr-3 w-20"
+      @click="openModalToCreateItem()"
+    >
+      新增
+    </VaButton>
     <VaButton color="danger" size="medium" class="w-30" @click="bantchDelete()">
       批量删除
     </VaButton>
@@ -48,6 +55,56 @@
   />
 
   <VaModal
+    :model-value="!!createdItem"
+    title="添加图书"
+    okText="确定"
+    cancelText="取消"
+    @ok="addNewItem"
+    @cancel="resetCreatedItem"
+  >
+    <VaInput
+      v-for="(key, index) in filteredAddKeys"
+      :key="index"
+      v-model="addItem[key]"
+      class="my-3 ml-5"
+      :label="key"
+    />
+    <div class="max-w-xs flex">
+      <VaSelect
+        v-model="classifyValue"
+        class="my-3 ml-5"
+        :options="classify"
+        label="分类"
+      />
+      <VaSelect
+        v-model="detailClassifyValue"
+        class="my-3 ml-5"
+        :options="detailClassify"
+        label="详细分类"
+        :disabled="disabled"
+      />
+    </div>
+    <VaTextarea
+      class="my-3 ml-5"
+      v-model="addItem['图书简介']"
+      label="图书简介"
+    />
+    <input
+      type="image"
+      class="my-3 ml-5"
+      :src="addItem['src']"
+      style="width: 250px"
+      :hidden = "hidden"
+    />
+    <input
+      class="my-3 ml-5"
+      style="background-color: "
+      type="file"
+      @change="changeAddImg"
+    /> 
+  </VaModal>
+
+  <VaModal
     :model-value="!!itemDetail"
     title="详细信息"
     size="small"
@@ -78,7 +135,6 @@
   </VaModal>
 
   <VaModal
-    class="modal-crud"
     :model-value="!!editedItem"
     title="编辑图书"
     okText="确定"
@@ -87,7 +143,7 @@
     @cancel="resetEditedItem"
   >
     <VaInput
-      v-for="key in filteredKeys"
+      v-for="key in filteredEditKeys"
       :key="key"
       v-model="editedItem[key]"
       class="my-3 ml-5"
@@ -95,33 +151,39 @@
       :disabled="key === 'id'"
     />
     <VaTextarea
-        class="my-3 ml-5"
-        v-model="editedItem['图书简介']"
-        label="图书简介"
-      />
-      <input
-        type="image"
-        class="my-3 ml-5"
-        :src="editedItem['src']"
-        style="width: 250px"
-      />
+      class="my-3 ml-5"
+      v-model="editedItem['图书简介']"
+      label="图书简介"
+    />
+    <input
+      type="image"
+      class="my-3 ml-5"
+      :src="editedItem['src']"
+      style="width: 250px"
+    />
     <input
       class="my-3 ml-5"
       style="background-color: "
       type="file"
-      @change="changeImg"
+      @change="changeEditImg"
     />
   </VaModal>
-
 </template>
 
 <script setup>
 import request from "@/utils/request";
 import { ElMessage } from "element-plus";
 import { useModal } from "vuestic-ui";
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, watch } from "vue";
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 const { confirm } = useModal();
+const classifyValue = ref("");
+const detailClassifyValue = ref("");
+const classify = ref();
+const detailClassify = ref()
+
+const disabled = ref(true);
+const hidden = ref(true);
 
 const itemDetail = ref(null);
 const editedItem = ref(null);
@@ -129,23 +191,81 @@ const tempItem = ref(null);
 const selectedItemsEmitted = ref(null);
 var items = ref([]);
 const selectedFile = ref();
+const createdItem = ref(false);
+
+const searchValue = ref("");
+const currentPage = ref(1);
+const itemsPerPage = ref(7);
 
 const columns = ref([
-  { key: "标题" ,width:"20rem"},
-  { key: "作者" ,width:"18rem"},
+  { key: "标题", width: "20rem" },
+  { key: "作者", width: "18rem" },
   { key: "标签" },
   { key: "分类" },
   { key: "actions" },
 ]);
-const searchValue = ref("");
-const currentPage = ref(1);
-const itemsPerPage = ref(7);
+const addItem = ref([
+  {
+    标题: "",
+    作者: "",
+    标签: "",
+    分类: "",
+    详细分类: "",
+    馆藏数量: null,
+    图书简介: "",
+    src: "",
+  },
+]);
+
 onMounted(() => {
   getBook();
+  getClassify();
 });
-const filteredKeys = computed(() => {
-  return Object.keys(editedItem.value).filter(key => key!=='图书简介'&&key!=='src')
+
+watch(classifyValue, (newValue, oldValue) => {
+  if(newValue !== ""){
+    disabled.value = false;
+  }
+  if (newValue !== oldValue) {
+    detailClassifyValue.value = "";
+    addItem.value.分类 = newValue;
+    const cateId = classify.value.indexOf(newValue) + 1;
+    return new Promise((resolve, reject) => {
+      request({
+        url:`/book/inquiryDetailClassify?cateId=${cateId}`,
+        method: "get",
+      })
+        .then((res) => {
+          console.log(res.data);
+          detailClassify.value = res.data.detailClassify.map((item) => item.subCateName);
+        })
+        .catch((err) => {
+          console.error(err);
+          reject(err);
+        });
+    });
+  }
+});
+watch(detailClassifyValue,(newValue,oldValue)=>{
+  if(newValue !== oldValue){
+    addItem.value.详细分类 = newValue;
+  }
 })
+
+const filteredEditKeys = computed(() => {
+  return Object.keys(editedItem.value).filter(
+    (key) => key !== "图书简介" && key !== "src"
+  );
+});
+const filteredAddKeys = computed(() => {
+  return Object.keys(addItem.value[0]).filter(
+    (key) =>
+      key !== "图书简介" &&
+      key !== "src" &&
+      key !== "分类" &&
+      key !== "详细分类"
+  );
+});
 const displayedItems = computed(() => {
   const startIndex = (currentPage.value - 1) * itemsPerPage.value;
   const endIndex = startIndex + itemsPerPage.value;
@@ -173,7 +293,6 @@ function getBook() {
       .then((res) => {
         items.value = [];
         res = res.data.books;
-        console.log(res);
         res.forEach((element, index) => {
           items.value[index] = {
             id: element.id,
@@ -197,6 +316,46 @@ function getBook() {
         reject(error);
       });
   });
+}
+// 获取分类列表
+function getClassify() {
+  return new Promise((resolve, reject) => {
+    request({
+      url: "/book/inquiryClassify",
+      method: "get",
+    })
+      .then((res) => {
+        console.log(res.data.classify);
+        classify.value = res.data.classify.map((item) => item.cateName);
+        
+      })
+      .catch((err) => {
+        console.error(err);
+        reject(err);
+      });
+  });
+}
+// 打开新增图书模态框
+function openModalToCreateItem() {
+  createdItem.value = true;
+}
+// 新增图书
+function addNewItem() {}
+// 取消新增图书
+function resetCreatedItem() {
+  createdItem.value = false;
+  addItem.value = [
+    {
+      标题: "",
+      作者: "",
+      标签: "",
+      分类: "",
+      详细分类: "",
+      馆藏数量: null,
+      图书简介: "",
+      src: "",
+    },
+  ];
 }
 // 显示详细信息
 function showDetails(row) {
@@ -254,7 +413,7 @@ function bantchDelete() {
   }).then((ok) => ok && deleteItems(selectedItemsArray));
 }
 function deleteItems(selectedItemsArray) {
-  if(selectedItemsArray.length === 0){
+  if (selectedItemsArray.length === 0) {
     return;
   }
   return new Promise((resolve, reject) => {
@@ -285,12 +444,12 @@ function deleteItems(selectedItemsArray) {
 }
 // 编辑图书模态框
 function openModalToEditItemById(id) {
-  tempItem.value = JSON.parse(JSON.stringify(this.items.filter(
-    (book) => book.id == id.rowData.id
-  )[0]));
-  editedItem.value = JSON.parse(JSON.stringify(this.items.filter(
-    (book) => book.id == id.rowData.id
-  )[0]));
+  tempItem.value = JSON.parse(
+    JSON.stringify(this.items.filter((book) => book.id == id.rowData.id)[0])
+  );
+  editedItem.value = JSON.parse(
+    JSON.stringify(this.items.filter((book) => book.id == id.rowData.id)[0])
+  );
 }
 // 编辑图书-》图片
 function editItem() {
@@ -306,19 +465,19 @@ function editItem() {
       },
     })
       .then((response) => {
-        editContent(response.data.message,1);
+        editContent(response.data.message, 1);
       })
       .catch((error) => {
         console.error(error);
       });
   } else {
     var src = editedItem.value.src.split("/");
-    editContent(src[src.length - 1],0);
+    editContent(src[src.length - 1], 0);
   }
 }
 
 // 编辑图书=》内容
-function editContent(src,sign) {
+function editContent(src, sign) {
   if (
     editedItem.value.标题 === tempItem.value.标题 &&
     editedItem.value.作者 === tempItem.value.作者 &&
@@ -326,7 +485,8 @@ function editContent(src,sign) {
     editedItem.value.分类 === tempItem.value.分类 &&
     editedItem.value.图书简介 === tempItem.value.图书简介 &&
     editedItem.value.详细分类 === tempItem.value.详细分类 &&
-    editedItem.value.馆藏数量 == tempItem.value.馆藏数量&&sign===0
+    editedItem.value.馆藏数量 == tempItem.value.馆藏数量 &&
+    sign === 0
   ) {
     editedItem.value = false;
   } else {
@@ -373,7 +533,8 @@ function editContent(src,sign) {
 function resetEditedItem() {
   editedItem.value = false;
 }
-function changeImg(event) {
+// 换图
+function changeEditImg(event) {
   selectedFile.value = event.target.files[0];
   editedItem.value.src = URL.createObjectURL(selectedFile.value);
 }
@@ -395,8 +556,8 @@ function changeImg(event) {
   font-size: smaller;
 }
 .va-data-table td {
-  white-space: nowrap; 
-  overflow: hidden; 
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis; /* 显示省略号 */
 }
 .va-data-table__table-tr--expanded > td > div {
