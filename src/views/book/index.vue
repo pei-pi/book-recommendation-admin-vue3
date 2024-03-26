@@ -89,19 +89,21 @@
       v-model="addItem['图书简介']"
       label="图书简介"
     />
-    <input
-      type="image"
-      class="my-3 ml-5"
-      :src="addItem['src']"
-      style="width: 250px"
-      :hidden = "hidden"
-    />
-    <input
-      class="my-3 ml-5"
-      style="background-color: "
-      type="file"
-      @change="changeAddImg"
-    /> 
+    <div>
+      <input
+        type="image"
+        class="my-3 ml-5"
+        :src="addItem['src']"
+        style="width: 250px"
+        :hidden="hidden"
+      />
+      <input
+        class="my-3 ml-5"
+        style="background-color: "
+        type="file"
+        @change="changeAddImg"
+      />
+    </div>
   </VaModal>
 
   <VaModal
@@ -180,10 +182,11 @@ const { confirm } = useModal();
 const classifyValue = ref("");
 const detailClassifyValue = ref("");
 const classify = ref();
-const detailClassify = ref()
+const detailClassify = ref();
 
 const disabled = ref(true);
 const hidden = ref(true);
+const addItemSelectedFile = ref();
 
 const itemDetail = ref(null);
 const editedItem = ref(null);
@@ -223,7 +226,7 @@ onMounted(() => {
 });
 
 watch(classifyValue, (newValue, oldValue) => {
-  if(newValue !== ""){
+  if (newValue !== "") {
     disabled.value = false;
   }
   if (newValue !== oldValue) {
@@ -232,12 +235,14 @@ watch(classifyValue, (newValue, oldValue) => {
     const cateId = classify.value.indexOf(newValue) + 1;
     return new Promise((resolve, reject) => {
       request({
-        url:`/book/inquiryDetailClassify?cateId=${cateId}`,
+        url: `/book/inquiryDetailClassify?cateId=${cateId}`,
         method: "get",
       })
         .then((res) => {
           console.log(res.data);
-          detailClassify.value = res.data.detailClassify.map((item) => item.subCateName);
+          detailClassify.value = res.data.detailClassify.map(
+            (item) => item.subCateName
+          );
         })
         .catch((err) => {
           console.error(err);
@@ -246,12 +251,11 @@ watch(classifyValue, (newValue, oldValue) => {
     });
   }
 });
-watch(detailClassifyValue,(newValue,oldValue)=>{
-  if(newValue !== oldValue){
+watch(detailClassifyValue, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
     addItem.value.详细分类 = newValue;
   }
-})
-
+});
 const filteredEditKeys = computed(() => {
   return Object.keys(editedItem.value).filter(
     (key) => key !== "图书简介" && key !== "src"
@@ -327,7 +331,6 @@ function getClassify() {
       .then((res) => {
         console.log(res.data.classify);
         classify.value = res.data.classify.map((item) => item.cateName);
-        
       })
       .catch((err) => {
         console.error(err);
@@ -335,15 +338,130 @@ function getClassify() {
       });
   });
 }
+// 重置添加图书框
+function resetAddItem() {
+  classifyValue.value = "";
+  detailClassifyValue = "";
+  disabled.value = true;
+  hidden.value = true;
+  addItem.value = [
+    {
+      标题: "",
+      作者: "",
+      标签: "",
+      分类: "",
+      详细分类: "",
+      馆藏数量: null,
+      图书简介: "",
+      src: "",
+    },
+  ];
+}
+// 增加图书=》图片
+function changeAddImg(event) {
+  if (event.target.files[0] !== "") hidden.value = false;
+  addItemSelectedFile.value = event.target.files[0];
+  addItem.value.src = URL.createObjectURL(event.target.files[0]);
+}
 // 打开新增图书模态框
 function openModalToCreateItem() {
   createdItem.value = true;
 }
-// 新增图书
-function addNewItem() {}
+// 新增图书=》图片
+function addNewItem() {
+  const formData = new FormData();
+  if (addItemSelectedFile.value === undefined) {
+    ElMessage({
+      showClose: true,
+      message: "图片不能为空",
+      type: "error",
+    });
+  }else{
+    formData.append("image", addItemSelectedFile.value);
+  request({
+    url: "/upload/image",
+    method: "POST",
+    data: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+    .then((response) => {
+      addContent(response.data.message);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+  }
+  
+}
+// 新增图书=》内容
+function addContent(src) {
+  if (
+    addItem.value["标题"] === undefined ||
+    addItem.value["作者"] === undefined ||
+    addItem.value["标签"] === undefined ||
+    addItem.value["分类"] === undefined ||
+    addItem.value["图书简介"] === undefined ||
+    addItem.value["详细分类"] === undefined ||
+    addItem.value["馆藏数量"] === null
+  ) {
+    ElMessage({
+      showClose: true,
+      message: "信息不能为空",
+      type: "error",
+    });
+  } else if (!/(^[1-9]\d*$)/.test(addItem.value.馆藏数量)) {
+    ElMessage({
+      showClose: true,
+      message: "请输入正确的数量",
+      type: "error",
+    });
+  } else {
+    return new Promise((resolve, reject) => {
+      request({
+        url: "book/addBook",
+        method: "post",
+        data: {
+          bookTitle: addItem.value["标题"],
+          bookAuthor: addItem.value["作者"],
+          bookTags: addItem.value["标签"],
+          bookContent: addItem.value["图书简介"],
+          bookSrc: src,
+          bookCategory: addItem.value["分类"],
+          bookDetailCategory: addItem.value["详细分类"],
+          store: addItem.value["馆藏数量"],
+        },
+      })
+        .then((res) => {
+          ElMessage({
+            showClose: true,
+            message: "图书添加成功",
+            type: "success",
+          });
+          resolve(res);
+          getBook();
+          resetCreatedItem();
+        })
+        .catch((error) => {
+          ElMessage({
+            showClose: true,
+            message: "图书添加失败",
+            type: "error",
+          });
+          console.error(error);
+          reject(error);
+        });
+    });
+  }
+}
 // 取消新增图书
 function resetCreatedItem() {
   createdItem.value = false;
+  addItemSelectedFile.value = "";
+  classifyValue.value = "";
+  disabled.value = true;
+  hidden.value = true;
   addItem.value = [
     {
       标题: "",
