@@ -376,24 +376,23 @@ function addNewItem() {
       message: "图片不能为空",
       type: "error",
     });
-  }else{
+  } else {
     formData.append("image", addItemSelectedFile.value);
-  request({
-    url: "/upload/image",
-    method: "POST",
-    data: formData,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  })
-    .then((response) => {
-      addContent(response.data.message);
+    request({
+      url: "/upload/image",
+      method: "POST",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     })
-    .catch((error) => {
-      console.error(error);
-    });
+      .then((response) => {
+        addContent(response.data.message);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
-  
 }
 // 新增图书=》内容
 function addContent(src) {
