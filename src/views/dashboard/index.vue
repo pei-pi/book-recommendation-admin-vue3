@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-row gap-5 max-h-52">
     <VaCard :bordered="false">
-      <VaCardTitle>图书数目</VaCardTitle>
-
+      <VaCardTitle>图书总数</VaCardTitle>
       <VaCardContent>
         {{ bookSum }}
       </VaCardContent>
@@ -21,21 +20,74 @@
       </VaCardContent>
     </VaCard>
   </div>
+  <VaCard class="mt-8 p-3">
+    <canvas id="chartCanvas"></canvas>
+  </VaCard>
+  
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import request from "@/utils/request";
+import Chart from "chart.js/auto";
 const bookSum = ref(0);
 const userSum = ref(0);
 const borrowSum = ref(0);
+const chartData = ref({
+  labels: [],
+  datasets: [
+    {
+      label: "数量",
+      backgroundColor: "#64B6F8",
+      data: [],
+    },
+  ],
+});
+let chartInstance = null;
 
 onMounted(() => {
   loadBooksSum();
   loadUsersSum();
   loadBorrowSum();
-  loadClassifyCount();
+  draw();
 });
+async function draw() {
+  await loadClassifyCount();
+  initializeChart();
+}
+function initializeChart() {
+  // 使用Chart.js创建一个新的图表实例
+  const ctx = document.getElementById("chartCanvas").getContext("2d");
+  chartInstance = new Chart(ctx, {
+    type: "bar",
+    data: chartData.value,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales:{
+        x:{
+          grid:{
+            display:false,
+          }
+        }
+      },
+      plugins: {
+        legend:{
+          display:false,
+        },
+        title: {
+          display: true,
+          text: '图书分类数量',
+          font: {
+            size: 15,
+          },
+        },
+      },
+      barThickness:40,
+      
+    },
+  });
+}
 
 function loadBooksSum() {
   return new Promise((resolve, reject) => {
@@ -79,20 +131,27 @@ function loadBorrowSum() {
       });
   });
 }
-function loadClassifyCount(){
-  return new Promise((resolve, reject) => {
-    request({
-      url: "/book/charts",
-      methods: "get",
+
+function loadClassifyCount() {
+  return request({
+    url: "/book/charts",
+    methods: "get",
+  })
+    .then((res) => {
+      chartData.value.labels = res.data.count.map((item) => item.cateName);
+      chartData.value.datasets[0].data = res.data.count.map((item)=>item.num);
     })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  });
+    .catch((err) => {
+      console.error(err);
+    });
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.va-card{
+  background-color: rgb(233, 249, 255) !important;
+}
+.va-card-title{
+  font-size: 14px;
+}
+</style>

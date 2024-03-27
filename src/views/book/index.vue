@@ -179,8 +179,8 @@ import { useModal } from "vuestic-ui";
 import { onMounted, computed, ref, watch } from "vue";
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 const { confirm } = useModal();
-const classifyValue = ref("");
-const detailClassifyValue = ref("");
+const classifyValue = ref();
+const detailClassifyValue = ref();
 const classify = ref();
 const detailClassify = ref();
 
