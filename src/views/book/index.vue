@@ -235,7 +235,7 @@ watch(classifyValue, (newValue, oldValue) => {
     const cateId = classify.value.indexOf(newValue) + 1;
     return new Promise((resolve, reject) => {
       request({
-        url: `/book/inquiryDetailClassify?cateId=${cateId}`,
+        url: `/category/inquiryDetailClassify?cateId=${cateId}`,
         method: "get",
       })
         .then((res) => {
@@ -325,7 +325,7 @@ function getBook() {
 function getClassify() {
   return new Promise((resolve, reject) => {
     request({
-      url: "/book/inquiryClassify",
+      url: "/category/inquiryClassify",
       method: "get",
     })
       .then((res) => {
@@ -337,25 +337,6 @@ function getClassify() {
         reject(err);
       });
   });
-}
-// 重置添加图书框
-function resetAddItem() {
-  classifyValue.value = "";
-  detailClassifyValue = "";
-  disabled.value = true;
-  hidden.value = true;
-  addItem.value = [
-    {
-      标题: "",
-      作者: "",
-      标签: "",
-      分类: "",
-      详细分类: "",
-      馆藏数量: null,
-      图书简介: "",
-      src: "",
-    },
-  ];
 }
 // 增加图书=》图片
 function changeAddImg(event) {

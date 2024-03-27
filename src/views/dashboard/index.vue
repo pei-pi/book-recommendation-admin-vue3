@@ -134,7 +134,7 @@ function loadBorrowSum() {
 
 function loadClassifyCount() {
   return request({
-    url: "/book/charts",
+    url: "/category/charts",
     methods: "get",
   })
     .then((res) => {
@@ -149,7 +149,7 @@ function loadClassifyCount() {
 
 <style scoped>
 .va-card{
-  background-color: rgb(233, 249, 255) !important;
+  background-color: rgb(243, 243, 243) !important;
 }
 .va-card-title{
   font-size: 14px;

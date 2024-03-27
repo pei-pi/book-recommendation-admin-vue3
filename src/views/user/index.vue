@@ -302,7 +302,7 @@ async function addNewItem() {
             .catch((error) => {
               ElMessage({
                 showClose: true,
-                message: "用户更新失败",
+                message: "用户添加失败",
                 type: "error",
               });
               reject(error);
