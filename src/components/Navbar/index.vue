@@ -48,7 +48,7 @@ const toggleMinimized = () =>{
 const options = ref([
   {
     name: "首页",
-    redirectTo: "",
+    redirectTo: "Dashboard",
   },
   {
     name: "个人信息",
