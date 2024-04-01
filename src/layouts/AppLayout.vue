@@ -3,7 +3,7 @@
         <navbar />
         <div style="display:flex; height: 100%;">
             <sideBar class="pt-8" :minimized="mini"></sideBar>
-            <div class="container flex flex-col w-full"> 
+            <div class="container flex flex-col w-full relative"> 
                 <router-view></router-view>
             </div>
            

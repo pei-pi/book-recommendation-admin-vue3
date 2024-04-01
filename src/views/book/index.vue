@@ -656,11 +656,10 @@ function changeEditImg(event) {
 .va-data-table td {
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* 显示省略号 */
+  text-overflow: ellipsis; 
 }
 .va-data-table__table-tr--expanded > td > div {
   width: 100%;
-  background-color: pink;
 }
 .va-modal__dialog {
   overflow-x: hidden;

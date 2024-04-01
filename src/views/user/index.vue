@@ -129,14 +129,6 @@ const columns = ref([
   { key: "actions" },
 ]);
 
-var items = ref([
-  {
-    userId: "",
-    username: "",
-    password: "",
-    score: "",
-  },
-]);
 
 const { confirm } = useModal();
 const editedItem = ref(null);
@@ -206,13 +198,13 @@ function deleteItemById(id) {
           message: "用户删除成功",
           type: "success",
         });
-        resolve(res);
         getUser();
+        resolve(res);
       })
       .catch((error) => {
         ElMessage({
           showClose: true,
-          message: "用户更新失败",
+          message: "用户删除失败",
           type: "error",
         });
         console.error(error);
@@ -247,8 +239,8 @@ function deleteItems(selectedItemsArray) {
           message: "批量删除成功",
           type: "success",
         });
-        resolve(res);
         getUser();
+        resolve(res);
       })
       .catch((error) => {
         console.error(error);
@@ -295,9 +287,9 @@ async function addNewItem() {
                 message: "用户添加成功",
                 type: "success",
               });
-              resolve(res);
               resetCreatedItem();
               getUser();
+              resolve(res);
             })
             .catch((error) => {
               ElMessage({
@@ -356,9 +348,10 @@ async function editItem() {
               message: "用户更新成功",
               type: "success",
             });
-            resolve(res);
+            
             editedItem.value = false;
             getUser();
+            resolve(res);
           })
           .catch((error) => {
             ElMessage({

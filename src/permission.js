@@ -2,7 +2,7 @@ import router from './router'
 import store from './store'
 import { ElMessage } from 'element-plus'
 import { getToken } from '@/utils/auth' 
-const whiteList = ['/login'] 
+const whiteList = ['/login',"/register"] 
 
 router.beforeEach(async(to, from, next) => {
   const hasToken = getToken()
